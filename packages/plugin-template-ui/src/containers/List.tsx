@@ -4,29 +4,40 @@ import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils';
 import { queries } from '../graphql';
 import React from 'react';
-import {
-  ICommonFormProps,
-  ICommonListProps
-} from '@erxes/ui-settings/src/common/types';
+import TemplateList from '../components/List';
 
-type Props = ICommonListProps &
-  ICommonFormProps & {
-    templatesQuery: any;
-  };
+type Props = {
+  queryParams: any;
+  loading: boolean;
+  type: string;
+};
 
-class ListContainer extends React.Component<Props> {
+type FinalProps = {
+  templatesQuery: any;
+} & Props;
+
+class ListContainer extends React.Component<FinalProps> {
   render() {
     const { templatesQuery } = this.props;
 
-    console.log(templatesQuery);
-    return <div>123</div>;
+    const templates = templatesQuery.templates || [];
+
+    const extendedProps = {
+      ...this.props,
+      templates
+    };
+
+    return <TemplateList {...extendedProps} />;
   }
 }
 
-export default withProps<Props>(
+export default withProps<FinalProps>(
   compose(
     graphql<Props, any>(gql(queries.templates), {
-      name: 'templatesQuery'
+      name: 'templatesQuery',
+      options: ({ type }) => ({
+        variables: { contentType: `cards:${type}` }
+      })
     })
   )(ListContainer)
 );
