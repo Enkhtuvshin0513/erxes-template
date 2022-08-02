@@ -6,9 +6,10 @@ import Button from '@erxes/ui/src/components/Button';
 import Tip from '@erxes/ui/src/components/Tip';
 import { ModalTrigger } from '@erxes/ui/src/components';
 import Icon from '@erxes/ui/src/components/Icon';
+import { ITemplate } from '../type';
 
 type Props = {
-  template: any;
+  template: ITemplate;
 };
 
 class TemplateRow extends React.Component<Props> {

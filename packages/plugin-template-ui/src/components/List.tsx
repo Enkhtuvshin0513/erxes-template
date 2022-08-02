@@ -9,19 +9,20 @@ import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Templaterow from './TemplateRow';
+import { ITemplate, ITemplatesQuery } from '../type';
 
 type Props = {
   queryParams: any;
-  templates: any[];
+  templates: ITemplate[];
 };
 
 type FinalProps = {
-  templatesQuery: any[];
+  templatesQuery: ITemplatesQuery[];
 } & Props;
 
 class ListComp extends React.Component<FinalProps> {
   renderContent() {
-    const { templates } = this.props;
+    const { templates, templatesQuery } = this.props;
 
     return (
       <>

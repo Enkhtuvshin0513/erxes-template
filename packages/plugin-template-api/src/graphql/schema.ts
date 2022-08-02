@@ -4,8 +4,6 @@ export const types = `
     name: String
     contentType: String
     content: JSON
-
-    jishee: String
   }
 `;
 

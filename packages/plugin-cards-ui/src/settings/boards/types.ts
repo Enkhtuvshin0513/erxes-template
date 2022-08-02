@@ -4,6 +4,16 @@ export type AddBoardMutationVariables = {
   name: string;
 };
 
+export interface ITemplateDoc {
+  name: string;
+  contentType: string;
+  content: object;
+}
+
+export interface ITemplate extends ITemplateDoc {
+  _id: string;
+}
+
 export type AddBoardMutationResponse = {
   addMutation: (params: {
     variables: AddBoardMutationVariables;

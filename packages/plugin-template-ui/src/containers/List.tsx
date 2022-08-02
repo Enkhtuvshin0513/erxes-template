@@ -2,9 +2,13 @@ import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils';
-import { queries } from '../graphql';
+import { mutations, queries } from '../graphql';
 import React from 'react';
 import TemplateList from '../components/List';
+import { RemovePipelineLabelMutationResponse } from '@erxes/ui-cards/src/boards/types';
+import { IRouterProps, MutationVariables } from '@erxes/ui/src/types';
+import { __ } from '@erxes/ui/src/utils';
+import { AppsRemoveMutationResponse } from '../type';
 
 type Props = {
   queryParams: any;
