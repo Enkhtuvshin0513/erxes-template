@@ -14,6 +14,7 @@ import { ITemplate, ITemplatesQuery } from '../type';
 type Props = {
   queryParams: any;
   templates: ITemplate[];
+  removeTemplate: (id: string) => void;
 };
 
 type FinalProps = {
@@ -22,7 +23,7 @@ type FinalProps = {
 
 class ListComp extends React.Component<FinalProps> {
   renderContent() {
-    const { templates, templatesQuery } = this.props;
+    const { templates, templatesQuery, removeTemplate } = this.props;
 
     return (
       <>
@@ -35,7 +36,11 @@ class ListComp extends React.Component<FinalProps> {
           </thead>
           <tbody id="templatelist">
             {templates.map((template, e) => [
-              <Templaterow template={template} key={template._id} />
+              <Templaterow
+                template={template}
+                key={template._id}
+                removeTemplate={removeTemplate}
+              />
             ])}
           </tbody>
         </Table>

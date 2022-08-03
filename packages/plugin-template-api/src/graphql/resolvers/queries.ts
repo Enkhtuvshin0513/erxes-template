@@ -1,6 +1,6 @@
 import { requireLogin } from '@erxes/api-utils/src/permissions';
 
-import { Templates } from '../../models';
+import { Templates } from '../models/models';
 
 const templateQueries = {
   templates(_root, { contentType }) {

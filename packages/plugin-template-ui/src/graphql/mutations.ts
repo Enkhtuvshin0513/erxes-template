@@ -6,6 +6,13 @@ const Templateadd = `
   }
 `;
 
+const TemplateDelete = `
+	mutation templateDelete($_id: String!) {
+		templateDelete(_id: $_id)
+	}
+`;
+
 export default {
-  Templateadd
+  Templateadd,
+  TemplateDelete
 };

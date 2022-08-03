@@ -1,5 +1,6 @@
 import { requireLogin } from '@erxes/api-utils/src/permissions';
-import { Templates, ITemplate } from '../../models';
+import { ITemplate } from '../models/definitions/template';
+import { Templates } from '../models/models';
 
 const templateMutations = {
   /**
@@ -9,6 +10,10 @@ const templateMutations = {
     const template = await Templates.createTemplate(doc);
 
     return template;
+  },
+
+  async templateDelete(_root, { _id }: { _id: string }) {
+    return Templates.deleteOne({ _id });
   }
 };
 

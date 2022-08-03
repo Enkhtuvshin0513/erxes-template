@@ -20,4 +20,5 @@ const params = `
 
 export const mutations = `
   templatesAdd(${params}): Template
+  templateDelete(_id: String!): JSON
 `;

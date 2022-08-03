@@ -1,4 +1,4 @@
-import { Templates } from './models';
+import { Templates } from './graphql/models/models';
 
 let client;
 

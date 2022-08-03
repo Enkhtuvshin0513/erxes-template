@@ -22,3 +22,9 @@ export type BrandRemoveMutationResponse = {
 export type AppsRemoveMutationResponse = {
   appsRemove: (params: { variables: { _id: string } }) => Promise<string>;
 };
+
+export type TemplateRemoveMutationResponse = {
+  removeTemplateMutation: (params: {
+    variables: MutationVariables;
+  }) => Promise<any>;
+};

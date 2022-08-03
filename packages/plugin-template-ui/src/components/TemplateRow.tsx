@@ -10,9 +10,15 @@ import { ITemplate } from '../type';
 
 type Props = {
   template: ITemplate;
+  removeTemplate: (id: string) => void;
 };
 
 class TemplateRow extends React.Component<Props> {
+  remove = () => {
+    const { removeTemplate, template } = this.props;
+    removeTemplate(template._id);
+  };
+
   renderEditAction = () => {
     const { template } = this.props;
 
@@ -37,7 +43,11 @@ class TemplateRow extends React.Component<Props> {
   };
 
   render() {
-    const { template } = this.props;
+    const { template, removeTemplate } = this.props;
+
+    const remove = () => {
+      removeTemplate(template._id);
+    };
 
     return (
       <tr>
@@ -46,7 +56,7 @@ class TemplateRow extends React.Component<Props> {
           <ActionButtons>
             {this.renderEditAction()}
             <Tip text={__('Delete')} placement="bottom">
-              <Button btnStyle="link" icon="cancel-1" />
+              <Button btnStyle="link" onClick={remove} icon="cancel-1" />
             </Tip>
           </ActionButtons>
         </td>
