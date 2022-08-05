@@ -18,13 +18,15 @@ type Props = {
   templates: ITemplate[];
   removeTemplate: (id: string) => void;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
+  currentType: string;
+  history: any;
 };
 
 type FinalProps = {
   templatesQuery: ITemplatesQuery[];
 } & Props;
 
-class ListComp extends React.Component<FinalProps> {
+class List extends React.Component<FinalProps> {
   renderContent() {
     const { templates, templatesQuery, removeTemplate } = this.props;
 
@@ -53,6 +55,8 @@ class ListComp extends React.Component<FinalProps> {
   }
 
   render() {
+    const { currentType, history } = this.props;
+
     const breadcrumb = [
       { title: __('Settings'), link: '/settings' },
       { title: __('template'), link: '/settings/template-library' }
@@ -104,10 +108,10 @@ class ListComp extends React.Component<FinalProps> {
             emptyImage="/images/actions/20.svg"
           />
         }
-        leftSidebar={<Sidebar />}
+        leftSidebar={<Sidebar history={history} currentType={currentType} />}
       />
     );
   }
 }
 
-export default ListComp;
+export default List;

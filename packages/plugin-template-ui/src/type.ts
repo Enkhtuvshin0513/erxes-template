@@ -18,10 +18,6 @@ export type ITemplatesQuery = {
   templatesQuery: ITemplate[];
 } & QueryResponse;
 
-export type contentTypeList = {
-  contentTypeList: ITemplate[];
-} & QueryResponse;
-
 export type TemplateRemoveMutationResponse = {
   removeTemplateMutation: (params: {
     variables: MutationVariables;

@@ -6,11 +6,13 @@ import LeftSidebar from '@erxes/ui/src/layout/components/Sidebar';
 
 type Props = {
   templates: any[];
+  currentType: any;
 };
 
 class SidebarList extends React.Component<Props> {
   renderSidebarHeader = () => {
     const { Header } = LeftSidebar;
+
     return (
       <div>
         <Header uppercase={true}> Type List </Header>
@@ -19,15 +21,22 @@ class SidebarList extends React.Component<Props> {
   };
 
   renderListItem(template: any) {
+    const { contentType, text } = template;
+    const { currentType } = this.props;
+
+    const className =
+      currentType && currentType === contentType ? 'active' : '';
+
     return (
       <li key={Math.random()}>
-        <Link to={'bbb'}>{__(template.text)}</Link>
+        <Link to={`?type=${contentType}`} className={className}>
+          {__(text)}
+        </Link>
       </li>
     );
   }
 
   renderList() {
-    const { Header } = LeftSidebar;
     const { templates } = this.props;
 
     return (
@@ -37,7 +46,6 @@ class SidebarList extends React.Component<Props> {
     );
   }
   render() {
-    const { Header } = LeftSidebar;
     return (
       <LeftSidebar header={this.renderSidebarHeader()} hasBorder={true}>
         <LeftSidebar.Section>{this.renderList()}</LeftSidebar.Section>

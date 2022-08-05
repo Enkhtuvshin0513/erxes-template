@@ -6,13 +6,14 @@ import React from 'react';
 import TemplateList from '../components/List';
 import { __ } from '@erxes/ui/src/utils';
 import { TemplateRemoveMutationResponse } from '../type';
-import { Alert, confirm, withProps } from '@erxes/ui/src/utils';
+import { Alert, confirm, withProps, router } from '@erxes/ui/src/utils';
 
 type Props = {
   queryParams: any;
   loading: boolean;
   type: string;
   contentType: string;
+  history: any;
 };
 
 type FinalProps = {
@@ -22,7 +23,7 @@ type FinalProps = {
 
 class ListContainer extends React.Component<FinalProps> {
   render() {
-    const { templatesQuery, removeTemplateMutation } = this.props;
+    const { templatesQuery, removeTemplateMutation, history } = this.props;
 
     const templates = templatesQuery.templates || [];
 
@@ -44,10 +45,15 @@ class ListContainer extends React.Component<FinalProps> {
       });
     };
 
+    const TemplateType = () => {};
+
+    const currentType = router.getParam(history, 'type');
+
     const extendedProps = {
       ...this.props,
       templates,
-      removeTemplate: remove
+      removeTemplate: remove,
+      currentType
     };
 
     return <TemplateList {...extendedProps} />;
