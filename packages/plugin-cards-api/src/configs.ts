@@ -45,7 +45,26 @@ export default {
     imports,
     internalNotes,
     search,
-    webhooks
+    webhooks,
+    templates: {
+      templateTypes: [
+        {
+          text: 'Deal',
+          contentType: 'deal',
+          icon: 'signal-alt-3'
+        },
+        {
+          text: 'Task',
+          contentType: 'task',
+          icon: 'laptop'
+        },
+        {
+          text: 'Ticket',
+          contentType: 'ticket',
+          icon: 'ticket'
+        }
+      ]
+    }
   },
 
   apolloServerContext: async (context, req, res) => {

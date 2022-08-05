@@ -1,5 +1,5 @@
 import { requireLogin } from '@erxes/api-utils/src/permissions';
-
+import { getServices, getService } from '@erxes/api-utils/src/serviceDiscovery';
 import { Templates } from '../models/models';
 
 const templateQueries = {
@@ -15,6 +15,32 @@ const templateQueries = {
 
   templatesTotalCount(_root, _args) {
     return Templates.find({}).countDocuments();
+  },
+
+  async templateGetService() {
+    const services = await getServices();
+    const TemplateTypes: Array<{ text: string; contentType: string }> = [];
+
+    for (const serviceName of services) {
+      const service = await getService(serviceName, true);
+      const meta = service.config?.meta || {};
+
+      console.log(meta);
+
+      if (meta && meta.templates) {
+        const types = meta.templates.templateTypes || [];
+        console.log();
+
+        for (const type of types) {
+          TemplateTypes.push({
+            ...type,
+            contentType: `${serviceName}:${type.contentType}`
+          });
+        }
+      }
+    }
+
+    return TemplateTypes;
   }
 };
 

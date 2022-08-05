@@ -12,6 +12,7 @@ type Props = {
   queryParams: any;
   loading: boolean;
   type: string;
+  contentType: string;
 };
 
 type FinalProps = {

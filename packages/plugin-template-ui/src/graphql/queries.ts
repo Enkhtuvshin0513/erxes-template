@@ -15,7 +15,14 @@ const totalCount = `
   }
 `;
 
+const templateGetService = `
+  query templateGetService {
+    templateGetService
+  }
+`;
+
 export default {
   templates,
-  totalCount
+  totalCount,
+  templateGetService
 };

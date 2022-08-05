@@ -10,6 +10,7 @@ export const types = `
 export const queries = `
   templates(contentType: String): [Template]
   templatesTotalCount: Int
+  templateGetService: JSON
 `;
 
 const params = `

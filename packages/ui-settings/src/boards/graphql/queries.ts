@@ -93,7 +93,6 @@ const templates = `
 
 export default {
   templates,
-
   boards,
   pipelines,
   stages,

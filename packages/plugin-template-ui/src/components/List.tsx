@@ -8,13 +8,16 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import { Title } from '@erxes/ui-settings/src/styles';
+import { IButtonMutateProps } from '@erxes/ui/src/types';
 import Templaterow from './TemplateRow';
 import { ITemplate, ITemplatesQuery } from '../type';
+import Sidebar from '../containers/Sidebar';
 
 type Props = {
   queryParams: any;
   templates: ITemplate[];
   removeTemplate: (id: string) => void;
+  renderButton: (props: IButtonMutateProps) => JSX.Element;
 };
 
 type FinalProps = {
@@ -101,6 +104,7 @@ class ListComp extends React.Component<FinalProps> {
             emptyImage="/images/actions/20.svg"
           />
         }
+        leftSidebar={<Sidebar />}
       />
     );
   }
