@@ -7,6 +7,7 @@ import TemplateList from '../components/List';
 import { __ } from '@erxes/ui/src/utils';
 import { TemplateRemoveMutationResponse } from '../type';
 import { Alert, confirm, withProps, router } from '@erxes/ui/src/utils';
+import { generatePaginationParams } from '@erxes/ui/src/utils/router';
 
 type Props = {
   queryParams: any;
@@ -45,8 +46,6 @@ class ListContainer extends React.Component<FinalProps> {
       });
     };
 
-    const TemplateType = () => {};
-
     const currentType = router.getParam(history, 'type');
 
     const extendedProps = {
@@ -56,16 +55,24 @@ class ListContainer extends React.Component<FinalProps> {
       currentType
     };
 
+    console.log(templates);
+
     return <TemplateList {...extendedProps} />;
   }
 }
 
+const templateListParams = queryParams => ({
+  ...generatePaginationParams(queryParams),
+  contentType: queryParams.type || 'customer'
+});
+
 export default withProps<FinalProps>(
   compose(
-    graphql<Props, any>(gql(queries.templates), {
+    graphql<Props, any, { contentType: string }>(gql(queries.templates), {
       name: 'templatesQuery',
-      options: ({ type }) => ({
-        variables: { contentType: `cards:${type}` }
+      options: ({ queryParams }) => ({
+        fetchPolicy: 'network-only',
+        variables: templateListParams(queryParams)
       })
     }),
     graphql<Props, TemplateRemoveMutationResponse>(

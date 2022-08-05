@@ -1,6 +1,6 @@
 const templates = `
-  query templatesQuery {
-    templates {
+  query templatesQuery($contentType: String) {
+    templates(contentType: $contentType) {
       _id
       name
       content

@@ -25,12 +25,8 @@ const templateQueries = {
       const service = await getService(serviceName, true);
       const meta = service.config?.meta || {};
 
-      console.log(meta);
-
       if (meta && meta.templates) {
         const types = meta.templates.templateTypes || [];
-        console.log();
-
         for (const type of types) {
           TemplateTypes.push({
             ...type,
