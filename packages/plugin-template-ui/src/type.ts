@@ -8,11 +8,21 @@ export interface ITemplateDoc {
   name: string;
   contentType: string;
   content: object;
+  _id: string;
 }
 
 export interface ITemplate extends ITemplateDoc {
   _id: string;
 }
+
+export interface ITemplateItem {
+  list: ITemplate[];
+  count: number;
+}
+
+export type templatesTotalCount = {
+  templatesTotalCount: number;
+} & QueryResponse;
 
 export type ITemplatesQuery = {
   templatesQuery: ITemplate[];
@@ -23,3 +33,8 @@ export type TemplateRemoveMutationResponse = {
     variables: MutationVariables;
   }) => Promise<any>;
 };
+
+export type TemplateItemQueryResponse = {
+  templates: ITemplateItem;
+  stopPolling: () => any;
+} & QueryResponse;

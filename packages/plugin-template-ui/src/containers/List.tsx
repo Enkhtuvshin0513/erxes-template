@@ -5,9 +5,15 @@ import { mutations, queries } from '../graphql';
 import React from 'react';
 import TemplateList from '../components/List';
 import { __ } from '@erxes/ui/src/utils';
-import { TemplateRemoveMutationResponse } from '../type';
+import Spinner from '@erxes/ui/src/components/Spinner';
+import {
+  TemplateItemQueryResponse,
+  TemplateRemoveMutationResponse,
+  templatesTotalCount
+} from '../type';
 import { Alert, confirm, withProps, router } from '@erxes/ui/src/utils';
 import { generatePaginationParams } from '@erxes/ui/src/utils/router';
+import { type } from 'os';
 
 type Props = {
   queryParams: any;
@@ -18,15 +24,39 @@ type Props = {
 };
 
 type FinalProps = {
-  templatesQuery: any;
+  templatesQuery: TemplateItemQueryResponse;
+  templatesTotalCount: templatesTotalCount;
 } & Props &
   TemplateRemoveMutationResponse;
 
-class ListContainer extends React.Component<FinalProps> {
+type State = {
+  loading: boolean;
+};
+
+class ListContainer extends React.Component<FinalProps, State> {
+  constructor(props: FinalProps) {
+    super(props);
+
+    this.state = {
+      loading: false
+    };
+  }
+
   render() {
-    const { templatesQuery, removeTemplateMutation, history } = this.props;
+    const {
+      templatesQuery,
+      removeTemplateMutation,
+      history,
+      templatesTotalCount
+    } = this.props;
+
+    console.log(templatesTotalCount.templatesTotalCount);
 
     const templates = templatesQuery.templates || [];
+
+    if (templatesQuery.loading) {
+      return <Spinner />;
+    }
 
     const remove = id => {
       confirm().then(() => {
@@ -50,12 +80,12 @@ class ListContainer extends React.Component<FinalProps> {
 
     const extendedProps = {
       ...this.props,
-      templates,
+      templates: templates,
       removeTemplate: remove,
+      loading: templatesQuery.loading || this.state.loading,
+      totalCount: templatesTotalCount.templatesTotalCount || 0,
       currentType
     };
-
-    console.log(templates);
 
     return <TemplateList {...extendedProps} />;
   }
@@ -68,13 +98,17 @@ const templateListParams = queryParams => ({
 
 export default withProps<FinalProps>(
   compose(
-    graphql<Props, any, { contentType: string }>(gql(queries.templates), {
-      name: 'templatesQuery',
-      options: ({ queryParams }) => ({
-        fetchPolicy: 'network-only',
-        variables: templateListParams(queryParams)
-      })
-    }),
+    graphql<Props, TemplateItemQueryResponse, { contentType: string }>(
+      gql(queries.templates),
+      {
+        name: 'templatesQuery',
+        options: ({ queryParams }) => ({
+          fetchPolicy: 'network-only',
+          variables: templateListParams(queryParams)
+        })
+      }
+    ),
+
     graphql<Props, TemplateRemoveMutationResponse>(
       gql(mutations.TemplateDelete),
       {
@@ -83,6 +117,11 @@ export default withProps<FinalProps>(
           refetchQueries: ['templates']
         })
       }
+    ),
+    compose(
+      graphql<Props, templatesTotalCount>(gql(queries.templatesTotalCount), {
+        name: 'templatesTotalCount'
+      })
     )
   )(ListContainer)
 );

@@ -9,8 +9,8 @@ const templates = `
   }
 `;
 
-const totalCount = `
-  query templatesTotalCountQuery {
+const templatesTotalCount = `
+  query templatesTotalCount {
     templatesTotalCount
   }
 `;
@@ -23,6 +23,6 @@ const templateGetService = `
 
 export default {
   templates,
-  totalCount,
+  templatesTotalCount,
   templateGetService
 };

@@ -19,7 +19,9 @@ type Props = {
   removeTemplate: (id: string) => void;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   currentType: string;
+  loading: boolean;
   history: any;
+  totalCount: number;
 };
 
 type FinalProps = {
@@ -55,7 +57,7 @@ class List extends React.Component<FinalProps> {
   }
 
   render() {
-    const { currentType, history } = this.props;
+    const { currentType, history, loading, totalCount } = this.props;
 
     const breadcrumb = [
       { title: __('Settings'), link: '/settings' },
@@ -103,7 +105,7 @@ class List extends React.Component<FinalProps> {
         content={
           <DataWithLoader
             data={this.renderContent()}
-            loading={false}
+            loading={loading}
             emptyText="There is no brand."
             emptyImage="/images/actions/20.svg"
           />

@@ -5,12 +5,17 @@ export const types = `
     contentType: String
     content: JSON
   }
+  type TemplateHistoryList {
+    list: [Template]
+    count: Int
+  }
 `;
 
 export const queries = `
   templates(contentType: String): [Template]
   templatesTotalCount: Int
   templateGetService: JSON
+  TemplateHistories(perPage: Int, page: Int, type:String) : TemplateHistoryList
 `;
 
 const params = `
