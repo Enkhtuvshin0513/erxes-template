@@ -13,8 +13,16 @@ const templateQueries = {
     return Templates.find(selector);
   },
 
-  templatesTotalCount(_root, _args) {
-    return Templates.find({}).countDocuments();
+  templatesTotalCount(_root, { contentType }) {
+    const selector = {} as any;
+
+    if (contentType) {
+      selector.contentType = contentType;
+    }
+
+    console.log(contentType, 'hhhhhhhhhhhhhhhhhhhhhhjjj');
+
+    return Templates.find(selector).countDocuments();
   },
 
   async templateGetService() {

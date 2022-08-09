@@ -17,10 +17,11 @@ import { type } from 'os';
 
 type Props = {
   queryParams: any;
+  currentTemplateId?: string;
   loading: boolean;
   type: string;
-  contentType: string;
   history: any;
+  refetcQureies?: any;
 };
 
 type FinalProps = {
@@ -91,6 +92,10 @@ class ListContainer extends React.Component<FinalProps, State> {
   }
 }
 
+const generateOptions = () => ({
+  refetchQueries: ['templatesQuery']
+});
+
 const templateListParams = queryParams => ({
   ...generatePaginationParams(queryParams),
   contentType: queryParams.type || 'customer'
@@ -113,14 +118,16 @@ export default withProps<FinalProps>(
       gql(mutations.TemplateDelete),
       {
         name: 'removeTemplateMutation',
-        options: () => ({
-          refetchQueries: ['templates']
-        })
+        options: generateOptions
       }
     ),
     compose(
       graphql<Props, templatesTotalCount>(gql(queries.templatesTotalCount), {
-        name: 'templatesTotalCount'
+        name: 'templatesTotalCount',
+        options: ({ queryParams, currentTemplateId }) => ({
+          fetchPolicy: 'network-only',
+          variables: templateListParams(queryParams)
+        })
       })
     )
   )(ListContainer)

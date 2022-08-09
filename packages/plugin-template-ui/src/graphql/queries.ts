@@ -10,8 +10,8 @@ const templates = `
 `;
 
 const templatesTotalCount = `
-  query templatesTotalCount {
-    templatesTotalCount
+  query templatesTotalCount($contentType: String) {
+    templatesTotalCount(contentType : $contentType)
   }
 `;
 
