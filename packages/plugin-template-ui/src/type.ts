@@ -9,6 +9,7 @@ export interface ITemplateDoc {
   contentType: string;
   content: object;
   _id: string;
+  totalcount: number;
 }
 
 export interface ITemplate extends ITemplateDoc {
@@ -23,6 +24,21 @@ export interface ITemplateItem {
 export type templatesTotalCount = {
   templatesTotalCount: number;
 } & QueryResponse;
+
+export type IButtonMutateProps = {
+  name?: string;
+  values: any;
+  isSubmitted: boolean;
+  confirmationUpdate?: boolean;
+  callback?: () => void;
+  resetSubmit?: () => void;
+  size?: string;
+  object?: any;
+  text?: string;
+  icon?: string;
+  type?: string;
+  disableLoading?: boolean;
+};
 
 export type ITemplatesQuery = {
   templatesQuery: ITemplate[];

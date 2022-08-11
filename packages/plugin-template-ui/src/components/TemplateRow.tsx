@@ -7,10 +7,13 @@ import Tip from '@erxes/ui/src/components/Tip';
 import { ModalTrigger } from '@erxes/ui/src/components';
 import Icon from '@erxes/ui/src/components/Icon';
 import { ITemplate } from '../type';
+import { IButtonMutateProps } from '../type';
+import FormTemplate from './Form';
 
 type Props = {
   template: ITemplate;
   removeTemplate: (id: string) => void;
+  renderButton: (props: IButtonMutateProps) => JSX.Element;
 };
 
 class TemplateRow extends React.Component<Props> {
@@ -20,9 +23,7 @@ class TemplateRow extends React.Component<Props> {
   };
 
   renderEditAction = () => {
-    const { template } = this.props;
-
-    const content = props => <>hi</>;
+    const content = props => <FormTemplate {...props} />;
 
     const editTrigger = (
       <Button btnStyle="link">

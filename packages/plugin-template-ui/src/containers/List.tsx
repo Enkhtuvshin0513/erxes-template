@@ -13,7 +13,6 @@ import {
 } from '../type';
 import { Alert, confirm, withProps, router } from '@erxes/ui/src/utils';
 import { generatePaginationParams } from '@erxes/ui/src/utils/router';
-import { type } from 'os';
 
 type Props = {
   queryParams: any;

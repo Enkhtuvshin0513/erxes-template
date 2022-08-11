@@ -8,10 +8,11 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import { Title } from '@erxes/ui-settings/src/styles';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
 import Templaterow from './TemplateRow';
 import { ITemplate, ITemplatesQuery } from '../type';
+import BrandForm from '@erxes/ui/src/brands/components/BrandForm';
 import Sidebar from '../containers/Sidebar';
+import { IButtonMutateProps } from '../type';
 
 type Props = {
   queryParams: any;
@@ -30,7 +31,7 @@ type FinalProps = {
 
 class List extends React.Component<FinalProps> {
   renderContent() {
-    const { templates, templatesQuery, removeTemplate } = this.props;
+    const { templates, renderButton, removeTemplate, totalCount } = this.props;
 
     return (
       <>
@@ -47,24 +48,25 @@ class List extends React.Component<FinalProps> {
                 template={template}
                 key={template._id}
                 removeTemplate={removeTemplate}
+                renderButton={renderButton}
               />
             ])}
           </tbody>
         </Table>
-        <Pagination count={10} />
+        <Pagination count={totalCount} />
       </>
     );
   }
 
   render() {
-    const { currentType, history, loading, totalCount } = this.props;
+    const { currentType, history, loading } = this.props;
 
     const breadcrumb = [
       { title: __('Settings'), link: '/settings' },
       { title: __('template'), link: '/settings/template-library' }
     ];
 
-    const addBrand = (
+    const addTemplate = (
       <Button
         id={'New Template'}
         btnStyle="success"
@@ -75,7 +77,7 @@ class List extends React.Component<FinalProps> {
       </Button>
     );
 
-    const content = props => <>hi</>;
+    const content = props => <BrandForm />;
 
     const leftActionBar = <Title>Template library</Title>;
 
@@ -84,14 +86,15 @@ class List extends React.Component<FinalProps> {
         size="lg"
         title="New template"
         autoOpenKey="showBrandAddModal"
-        trigger={addBrand}
+        trigger={addTemplate}
         content={content}
       />
     );
 
     return (
       <Wrapper
-        header={<Wrapper.Header title={'template'} breadcrumb={breadcrumb} />}
+        header={<Wrapper.Header title={'Template'} breadcrumb={breadcrumb} />}
+        footer={<Pagination count={10} />}
         mainHead={
           <HeaderDescription
             icon="/images/actions/32.svg"
@@ -106,7 +109,7 @@ class List extends React.Component<FinalProps> {
           <DataWithLoader
             data={this.renderContent()}
             loading={loading}
-            emptyText="There is no brand."
+            emptyText="There is no templates."
             emptyImage="/images/actions/20.svg"
           />
         }

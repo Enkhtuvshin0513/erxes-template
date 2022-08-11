@@ -1,16 +1,27 @@
 import { requireLogin } from '@erxes/api-utils/src/permissions';
 import { getServices, getService } from '@erxes/api-utils/src/serviceDiscovery';
 import { Templates } from '../models/models';
+import { paginate } from '@erxes/api-utils/src/core';
 
 const templateQueries = {
-  templates(_root, { contentType }) {
+  templates(
+    _root,
+    {
+      contentType,
+      ...args
+    }: { page: number; perPage: number; contentType: string }
+  ) {
     const selector = {} as any;
 
     if (contentType) {
       selector.contentType = contentType;
     }
 
-    return Templates.find(selector);
+    const list = paginate(Templates.find(selector), args).sort({
+      date: -1
+    });
+
+    return list;
   },
 
   templatesTotalCount(_root, { contentType }) {
@@ -19,8 +30,6 @@ const templateQueries = {
     if (contentType) {
       selector.contentType = contentType;
     }
-
-    console.log(contentType, 'hhhhhhhhhhhhhhhhhhhhhhjjj');
 
     return Templates.find(selector).countDocuments();
   },

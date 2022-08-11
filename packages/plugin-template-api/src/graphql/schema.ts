@@ -12,7 +12,7 @@ export const types = `
 `;
 
 export const queries = `
-  templates(contentType: String): [Template]
+  templates(contentType: String, page: Int, perPage: Int): [Template]
   templatesTotalCount (contentType : String): Int
   templateGetService: JSON
   TemplateHistories(perPage: Int, page: Int, type:String) : TemplateHistoryList
