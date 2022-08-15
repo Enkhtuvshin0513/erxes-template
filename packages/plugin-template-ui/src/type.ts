@@ -54,3 +54,12 @@ export type TemplateItemQueryResponse = {
   templates: ITemplateItem;
   stopPolling: () => any;
 } & QueryResponse;
+
+export type IOptions = {
+  boardName: string;
+  templateName: string;
+  StageItem: any;
+  PipelineForm: any;
+  additionalButton?: string;
+  additionalButtonText?: string;
+};

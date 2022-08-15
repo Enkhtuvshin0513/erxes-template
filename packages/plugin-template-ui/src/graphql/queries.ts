@@ -1,6 +1,6 @@
 const templatesTotalCount = `
-  query templatesTotalCount($contentType: String) {
-    templatesTotalCount(contentType : $contentType)
+  query templatesTotalCount($contentType: String, $searchValue: String) {
+    templatesTotalCount(contentType : $contentType, searchValue: $searchValue)
   }
 `;
 
@@ -12,12 +12,14 @@ const templateGetService = `
 
 const listParamsDef = `
   $contentType: String
+  $searchValue: String
   $page: Int
   $perPage: Int
 `;
 
 const listParamsValue = `
   contentType: $contentType
+  searchValue: $searchValue
   page: $page
   perPage: $perPage
 `;

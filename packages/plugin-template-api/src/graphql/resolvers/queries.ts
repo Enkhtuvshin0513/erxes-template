@@ -8,8 +8,14 @@ const templateQueries = {
     _root,
     {
       contentType,
+      searchValue,
       ...args
-    }: { page: number; perPage: number; contentType: string }
+    }: {
+      page: number;
+      perPage: number;
+      contentType: string;
+      searchValue: string;
+    }
   ) {
     const selector = {} as any;
 
@@ -17,6 +23,13 @@ const templateQueries = {
       selector.contentType = contentType;
     }
 
+    if (searchValue) {
+      selector.name = {
+        $in: [new RegExp(`.*${searchValue}.*`, 'i')]
+      };
+      console.log(searchValue, '11111111111111111111');
+    }
+    console.log(Templates.find(selector), '22222222222222222222222222');
     const list = paginate(Templates.find(selector), args).sort({
       date: -1
     });
@@ -24,11 +37,15 @@ const templateQueries = {
     return list;
   },
 
-  templatesTotalCount(_root, { contentType }) {
+  templatesTotalCount(_root, { contentType, searchValue }) {
     const selector = {} as any;
 
     if (contentType) {
       selector.contentType = contentType;
+    }
+
+    if (searchValue) {
+      selector.searchValue = searchValue;
     }
 
     return Templates.find(selector).countDocuments();
@@ -57,7 +74,7 @@ const templateQueries = {
   }
 };
 
-requireLogin(templateQueries, 'templates');
-requireLogin(templateQueries, 'templatesTotalCount');
+// requireLogin(templateQueries, "templates");
+// requireLogin(templateQueries, "templatesTotalCount");
 
 export default templateQueries;

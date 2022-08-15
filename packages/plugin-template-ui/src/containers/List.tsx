@@ -50,8 +50,6 @@ class ListContainer extends React.Component<FinalProps, State> {
       templatesTotalCount
     } = this.props;
 
-    console.log(templatesTotalCount.templatesTotalCount);
-
     const templates = templatesQuery.templates || [];
 
     if (templatesQuery.loading) {
@@ -77,10 +75,12 @@ class ListContainer extends React.Component<FinalProps, State> {
     };
 
     const currentType = router.getParam(history, 'type');
+    const searchValue = this.props.queryParams.searchValue || '';
 
     const extendedProps = {
       ...this.props,
       templates: templates,
+      searchValue,
       removeTemplate: remove,
       loading: templatesQuery.loading || this.state.loading,
       totalCount: templatesTotalCount.templatesTotalCount || 0,
@@ -97,21 +97,23 @@ const generateOptions = () => ({
 
 const templateListParams = queryParams => ({
   ...generatePaginationParams(queryParams),
-  contentType: queryParams.type || 'customer'
+  contentType: queryParams.type || 'cards:deal',
+  searchValue: queryParams.searchValue
 });
 
 export default withProps<FinalProps>(
   compose(
-    graphql<Props, TemplateItemQueryResponse, { contentType: string }>(
-      gql(queries.templates),
-      {
-        name: 'templatesQuery',
-        options: ({ queryParams }) => ({
-          fetchPolicy: 'network-only',
-          variables: templateListParams(queryParams)
-        })
-      }
-    ),
+    graphql<
+      Props,
+      TemplateItemQueryResponse,
+      { contentType: string; searchValue: string }
+    >(gql(queries.templates), {
+      name: 'templatesQuery',
+      options: ({ queryParams }: { queryParams: any }) => ({
+        fetchPolicy: 'network-only',
+        variables: templateListParams(queryParams)
+      })
+    }),
 
     graphql<Props, TemplateRemoveMutationResponse>(
       gql(mutations.TemplateDelete),
@@ -123,7 +125,7 @@ export default withProps<FinalProps>(
     compose(
       graphql<Props, templatesTotalCount>(gql(queries.templatesTotalCount), {
         name: 'templatesTotalCount',
-        options: ({ queryParams, currentTemplateId }) => ({
+        options: ({ queryParams }) => ({
           fetchPolicy: 'network-only',
           variables: templateListParams(queryParams)
         })

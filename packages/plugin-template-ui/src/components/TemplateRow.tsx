@@ -8,7 +8,7 @@ import { ModalTrigger } from '@erxes/ui/src/components';
 import Icon from '@erxes/ui/src/components/Icon';
 import { ITemplate } from '../type';
 import { IButtonMutateProps } from '../type';
-import FormTemplate from './Form';
+import ListForm from './Form';
 
 type Props = {
   template: ITemplate;
@@ -23,7 +23,7 @@ class TemplateRow extends React.Component<Props> {
   };
 
   renderEditAction = () => {
-    const content = props => <FormTemplate {...props} />;
+    const content = props => <ListForm {...props} />;
 
     const editTrigger = (
       <Button btnStyle="link">
