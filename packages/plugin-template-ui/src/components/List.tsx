@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom';
 import { BarItems } from '@erxes/ui/src/layout/styles';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { IPipeline } from '@erxes/ui-cards/src/boards/types';
+import Form from './Form';
 
 type Props = {
   queryParams: any;
@@ -39,6 +40,7 @@ type FinalProps = {
 } & Props;
 
 type State = {
+  showModal: boolean;
   searchValue: string;
 };
 
@@ -49,6 +51,7 @@ class List extends React.Component<FinalProps, State> {
     super(props);
 
     this.state = {
+      showModal: false,
       searchValue: this.props.searchValue
     };
   }
@@ -122,6 +125,16 @@ class List extends React.Component<FinalProps, State> {
     const { options, history } = this.props;
     const templateName = options ? options.templateName : 'Tempalate';
 
+    const addTrigger = (
+      <Button btnStyle="success" size="small" icon="plus-circle">
+        Add Template
+      </Button>
+    );
+
+    const templateForm = props => {
+      return <Form {...props} />;
+    };
+
     return (
       <BarItems>
         <FormControl
@@ -133,13 +146,15 @@ class List extends React.Component<FinalProps, State> {
         />
 
         {this.renderAdditionalButton()}
-        <Button
-          btnStyle="success"
-          icon="plus-circle"
-          onClick={this.addTempalate}
-        >
-          Add {templateName}
-        </Button>
+
+        <ModalTrigger
+          title="New template"
+          trigger={addTrigger}
+          autoOpenKey="showTemplateModal"
+          size="xl"
+          content={templateForm}
+          backDrop="static"
+        />
       </BarItems>
     );
   }
