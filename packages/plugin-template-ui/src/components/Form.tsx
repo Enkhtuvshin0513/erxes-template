@@ -1,8 +1,6 @@
 import { __, Button, Form } from '@erxes/ui/src';
-
 import { IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
-
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import ErrorBoundary from '@erxes/ui/src/components/ErrorBoundary';
 import { RenderDynamicComponent } from '@erxes/ui/src/utils/core';
