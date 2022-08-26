@@ -8,7 +8,6 @@ export interface ITemplateDoc {
   name: string;
   contentType: string;
   content: object;
-  _id: string;
   totalcount: number;
 }
 

@@ -14,7 +14,6 @@ import { graphql } from 'react-apollo';
 import PipelineForm from '../components/PipelineForm';
 import { queries } from '@erxes/ui-settings/src/boards/graphql';
 import { queries as teamQueries } from '@erxes/ui/src/team/graphql';
-
 import { IOption } from '../types';
 
 type Props = {

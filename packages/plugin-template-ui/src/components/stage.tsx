@@ -64,7 +64,6 @@ class stage extends React.Component<Props, {}> {
   };
 
   render() {
-    console.log('HIII');
     const { options, type, departments } = this.props;
     const Item = options ? options.StageItem : StageItem;
 

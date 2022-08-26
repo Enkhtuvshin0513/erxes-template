@@ -6,12 +6,18 @@ import Modal from 'react-bootstrap/Modal';
 import { IDepartment } from '@erxes/ui/src/team/types';
 import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
+import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
+import { withProps } from '@erxes/ui/src/utils';
+import { queries as teamQueries } from '@erxes/ui/src/team/graphql';
+import { queries } from '@erxes/ui-settings/src/boards/graphql';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { IBoard, IPipeline, IStage } from '@erxes/ui-cards/src/boards/types';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import Select from 'react-select-plus';
 import { COLORS } from '@erxes/ui/src/constants/colors';
+import { graphql } from 'react-apollo';
 import { Flex } from '@erxes/ui/src/styles/main';
 import { ExpandWrapper } from '@erxes/ui-settings/src/styles';
 import { SelectMemberStyled } from '@erxes/ui-settings/src/boards/styles';
@@ -26,14 +32,15 @@ import Stages from './settings/boards/components/Stages';
 import BoardNumberConfigs from './settings/boards/components/numberConfig/BoardNumberConfigs';
 
 type Props = {
-  templates: any[];
   boardId: string;
   renderExtraFields?: (formProps: IFormProps) => JSX.Element;
   pipeline?: IPipeline;
   boards: IBoard[];
   options?: IOption;
   type: string;
+  templates: any[];
   stages?: IStage[];
+  contentType: string;
   departments: IDepartment[];
 };
 
@@ -54,354 +61,328 @@ type State = {
 };
 
 class TemplateForm extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+  // constructor(props: Props) {
+  //   super(props);
 
-    const { pipeline, stages } = this.props;
+  //   const { pipeline, stages } = this.props;
 
-    this.state = {
-      saveAsTemplate: false,
-      stages: (stages || []).map(stage => ({ ...stage })),
-      visibility: pipeline ? pipeline.visibility || 'public' : 'public',
-      boardId: props.boardId || '',
-      excludeCheckUserIds: pipeline ? pipeline.excludeCheckUserIds || [] : [],
-      isCheckUser: pipeline ? pipeline.isCheckUser || false : false,
-      selectedMemberIds: pipeline ? pipeline.memberIds || [] : [],
-      isCheckDepartment: pipeline ? pipeline.isCheckDepartment || false : false,
-      backgroundColor:
-        (pipeline && pipeline.bgColor) || colors.colorPrimaryDark,
-      template: '',
-      numberConfig: (pipeline && pipeline.numberConfig) || '',
-      numberSize: (pipeline && pipeline.numberSize) || '',
-      departmentIds: pipeline ? pipeline.departmentIds || [] : []
-    };
-  }
-  onChangeVisibility = (e: React.FormEvent<HTMLElement>) => {
-    this.setState({
-      visibility: (e.currentTarget as HTMLInputElement).value
-    });
-  };
-  onChangeValue = <T extends keyof State>(key: T, value: State[T]) => {
-    this.setState(({ [key]: value } as unknown) as Pick<State, keyof State>);
-  };
-  onChangeStages = stages => {
-    this.setState({ stages });
-  };
-  onColorChange = e => {
-    this.setState({ backgroundColor: e.hex });
-  };
-  onChangeIsCheckUser = e => {
-    const isChecked = (e.currentTarget as HTMLInputElement).checked;
-    this.setState({ isCheckUser: isChecked });
-  };
-  onChangeDominantUsers = items => {
-    this.setState({ excludeCheckUserIds: items });
-  };
-  onChangeDepartments = options => {
-    this.setState({ departmentIds: (options || []).map(o => o.value) });
-  };
-  onChangeMembers = items => {
-    this.setState({ selectedMemberIds: items });
-  };
-  onChangeIsSaveAsTemplate = e => {
-    const isChecked = (e.currentTarget as HTMLInputElement).checked;
-    this.setState({ saveAsTemplate: isChecked });
-  };
-  onChangeNumber = (key: string, value: string) => {
-    this.setState({ [key]: value } as any);
-  };
-  onChangeIsCheckDepartment = e => {
-    const isChecked = (e.currentTarget as HTMLInputElement).checked;
-    this.setState({ isCheckDepartment: isChecked });
-  };
+  //   this.state = {
+  //     saveAsTemplate: false,
+  //     stages: (stages || []).map((stage) => ({ ...stage })),
+  //     visibility: pipeline ? pipeline.visibility || "public" : "public",
+  //     boardId: props.boardId || "",
+  //     excludeCheckUserIds: pipeline ? pipeline.excludeCheckUserIds || [] : [],
+  //     isCheckUser: pipeline ? pipeline.isCheckUser || false : false,
+  //     selectedMemberIds: pipeline ? pipeline.memberIds || [] : [],
+  //     isCheckDepartment: pipeline ? pipeline.isCheckDepartment || false : false,
+  //     backgroundColor:
+  //       (pipeline && pipeline.bgColor) || colors.colorPrimaryDark,
+  //     template: "",
+  //     numberConfig: (pipeline && pipeline.numberConfig) || "",
+  //     numberSize: (pipeline && pipeline.numberSize) || "",
+  //     departmentIds: pipeline ? pipeline.departmentIds || [] : [],
+  //   };
+  // }
+  // onChangeVisibility = (e: React.FormEvent<HTMLElement>) => {
+  //   this.setState({
+  //     visibility: (e.currentTarget as HTMLInputElement).value,
+  //   });
+  // };
+  // onChangeValue = <T extends keyof State>(key: T, value: State[T]) => {
+  //   this.setState(({ [key]: value } as unknown) as Pick<State, keyof State>);
+  // };
+  // onChangeStages = (stages) => {
+  //   this.setState({ stages });
+  // };
+  // onColorChange = (e) => {
+  //   this.setState({ backgroundColor: e.hex });
+  // };
+  // onChangeIsCheckUser = (e) => {
+  //   const isChecked = (e.currentTarget as HTMLInputElement).checked;
+  //   this.setState({ isCheckUser: isChecked });
+  // };
+  // onChangeDominantUsers = (items) => {
+  //   this.setState({ excludeCheckUserIds: items });
+  // };
+  // onChangeDepartments = (options) => {
+  //   this.setState({ departmentIds: (options || []).map((o) => o.value) });
+  // };
+  // onChangeMembers = (items) => {
+  //   this.setState({ selectedMemberIds: items });
+  // };
+  // onChangeIsSaveAsTemplate = (e) => {
+  //   const isChecked = (e.currentTarget as HTMLInputElement).checked;
+  //   this.setState({ saveAsTemplate: isChecked });
+  // };
+  // onChangeNumber = (key: string, value: string) => {
+  //   this.setState({ [key]: value } as any);
+  // };
+  // onChangeIsCheckDepartment = (e) => {
+  //   const isChecked = (e.currentTarget as HTMLInputElement).checked;
+  //   this.setState({ isCheckDepartment: isChecked });
+  // };
 
-  renderTemplates() {
-    const { templates } = this.props;
+  // renderBoards() {
+  //   const { boards } = this.props;
 
-    // const boardOptions = templates.map((template) => ({
-    //   value: template._id,
-    //   label: template.name,
-    // }));
+  //   // const boardOptions = boards.map(board => ({
+  //   //   value: board._id,
+  //   //   label: board.name
+  //   // }));
 
-    // const onChange = (item) => {
-    //   const template = templates.find(
-    //     (template) => template._id === item.value
-    //   );
+  //   // const onChange = item => this.setState({ boardId: item.value });
 
-    //   this.setState({ stages: template.content.stages });
+  //   return (
+  //     <FormGroup>
+  //       <ControlLabel required={true}>Board</ControlLabel>
+  //       <Select
+  //         placeholder={__("Choose a board")}
+  //         value={this.state.boardId}
+  //         // options={boardOptions}
+  //         // onChange={onChange}
+  //         clearable={false}
+  //       />
+  //     </FormGroup>
+  //   );
+  // }
 
-    //   this.setState({ template: item.value });
-    // };
+  // renderSelectMembers() {
+  //   const { visibility, selectedMemberIds, departmentIds } = this.state;
 
-    return (
-      <FormGroup>
-        <ControlLabel required={true}>Template</ControlLabel>
-        <Select
-          placeholder={__('Choose a template')}
-          // value={this.state.template}
-          // options={boardOptions}
-          // onChange={onChange}
-          clearable={false}
-        />
-      </FormGroup>
-    );
-  }
+  //   if (visibility === "public") {
+  //     return;
+  //   }
 
-  renderBoards() {
-    const { boards } = this.props;
+  //   return (
+  //     <>
+  //       <FormGroup>
+  //         <SelectMemberStyled zIndex={2003}>
+  //           <ControlLabel>Members</ControlLabel>
 
-    // const boardOptions = boards.map(board => ({
-    //   value: board._id,
-    //   label: board.name
-    // }));
+  //           <SelectTeamMembers
+  //             label="Choose members"
+  //             name="selectedMemberIds"
+  //             initialValue={selectedMemberIds}
+  //             onSelect={this.onChangeMembers}
+  //           />
+  //         </SelectMemberStyled>
+  //       </FormGroup>
+  //       <FormGroup>
+  //         <SelectMemberStyled zIndex={2002}>
+  //           <ControlLabel>Departments</ControlLabel>
+  //           <Select
+  //             value={departmentIds}
+  //             options={generateTree(
+  //               this.props.departments,
+  //               null,
+  //               (node, level) => ({
+  //                 value: node._id,
+  //                 label: `${"---".repeat(level)} ${node.title}`,
+  //               })
+  //             )}
+  //             onChange={this.onChangeDepartments.bind(this)}
+  //             placeholder={__("Choose department ...")}
+  //             multi={true}
+  //           />
+  //         </SelectMemberStyled>
+  //       </FormGroup>
+  //     </>
+  //   );
+  // }
+  // renderNumberInput() {
+  //   return (
+  //     <FormGroup>
+  //       <BoardNumberConfigs
+  //         onChange={(key: string, conf: string) =>
+  //           this.onChangeNumber(key, conf)
+  //         }
+  //         config={this.state.numberConfig || ""}
+  //         size={this.state.numberSize || ""}
+  //       />
+  //     </FormGroup>
+  //   );
+  // }
 
-    // const onChange = item => this.setState({ boardId: item.value });
+  // renderDominantUsers() {
+  //   const { isCheckUser, isCheckDepartment, excludeCheckUserIds } = this.state;
 
-    return (
-      <FormGroup>
-        <ControlLabel required={true}>Board</ControlLabel>
-        <Select
-          placeholder={__('Choose a board')}
-          value={this.state.boardId}
-          // options={boardOptions}
-          // onChange={onChange}
-          clearable={false}
-        />
-      </FormGroup>
-    );
-  }
+  //   if (!isCheckUser && !isCheckDepartment) {
+  //     return;
+  //   }
 
-  renderSelectMembers() {
-    const { visibility, selectedMemberIds, departmentIds } = this.state;
+  //   return (
+  //     <FormGroup>
+  //       <SelectMemberStyled>
+  //         <ControlLabel>
+  //           Users eligible to see all {this.props.type}
+  //         </ControlLabel>
 
-    if (visibility === 'public') {
-      return;
-    }
+  //         <SelectTeamMembers
+  //           label="Choose members"
+  //           name="excludeCheckUserIds"
+  //           initialValue={excludeCheckUserIds}
+  //           onSelect={this.onChangeDominantUsers}
+  //         />
+  //       </SelectMemberStyled>
+  //     </FormGroup>
+  //   );
+  // }
 
-    return (
-      <>
-        <FormGroup>
-          <SelectMemberStyled zIndex={2003}>
-            <ControlLabel>Members</ControlLabel>
+  // renderContent = (formProps: IFormProps) => {
+  //   const { saveAsTemplate } = this.state;
+  //   const { pipeline, renderExtraFields, options } = this.props;
+  //   const { templatesQuery } = this.props;
+  //   const object = pipeline || ({} as IPipeline);
 
-            <SelectTeamMembers
-              label="Choose members"
-              name="selectedMemberIds"
-              initialValue={selectedMemberIds}
-              onSelect={this.onChangeMembers}
-            />
-          </SelectMemberStyled>
-        </FormGroup>
-        <FormGroup>
-          <SelectMemberStyled zIndex={2002}>
-            <ControlLabel>Departments</ControlLabel>
-            <Select
-              value={departmentIds}
-              options={generateTree(
-                this.props.departments,
-                null,
-                (node, level) => ({
-                  value: node._id,
-                  label: `${'---'.repeat(level)} ${node.title}`
-                })
-              )}
-              onChange={this.onChangeDepartments.bind(this)}
-              placeholder={__('Choose department ...')}
-              multi={true}
-            />
-          </SelectMemberStyled>
-        </FormGroup>
-      </>
-    );
-  }
-  renderNumberInput() {
-    return (
-      <FormGroup>
-        <BoardNumberConfigs
-          onChange={(key: string, conf: string) =>
-            this.onChangeNumber(key, conf)
-          }
-          config={this.state.numberConfig || ''}
-          size={this.state.numberSize || ''}
-        />
-      </FormGroup>
-    );
-  }
+  //   const templates = templatesQuery.templates || [];
 
-  renderDominantUsers() {
-    const { isCheckUser, isCheckDepartment, excludeCheckUserIds } = this.state;
+  //   console.log(templates);
 
-    if (!isCheckUser && !isCheckDepartment) {
-      return;
-    }
+  //   const popoverBottom = (
+  //     <Popover id="color-picker">
+  //       <TwitterPicker
+  //         width="266px"
+  //         triangle="hide"
+  //         color={this.state.backgroundColor}
+  //         onChange={this.onColorChange}
+  //         colors={COLORS}
+  //       />
+  //     </Popover>
+  //   );
 
-    return (
-      <FormGroup>
-        <SelectMemberStyled>
-          <ControlLabel>
-            Users eligible to see all {this.props.type}
-          </ControlLabel>
+  //   return (
+  //     <div id="manage-template-modal">
+  //       <FlexContent>
+  //         <FlexItem count={4}>
+  //           <Formgroup>
+  //             <ControlLabel required={true}>Template Name</ControlLabel>
+  //             <FormControl
+  //               {...formProps}
+  //               name="templateName"
+  //               autoFocus={true}
+  //               required={true}
+  //             />
+  //           </Formgroup>
+  //         </FlexItem>
+  //       </FlexContent>
 
-          <SelectTeamMembers
-            label="Choose members"
-            name="excludeCheckUserIds"
-            initialValue={excludeCheckUserIds}
-            onSelect={this.onChangeDominantUsers}
-          />
-        </SelectMemberStyled>
-      </FormGroup>
-    );
-  }
+  //       {/* {renderExtraFields && renderExtraFields(formProps)} */}
+  //       <Flex>
+  //         <ExpandWrapper>
+  //           <FormGroup>
+  //             <ControlLabel required={true}>Visibility</ControlLabel>
+  //             <FormControl
+  //               {...formProps}
+  //               name="visibility"
+  //               componentClass="select"
+  //               value={this.state.visibility}
+  //               onChange={this.onChangeVisibility}
+  //             >
+  //               <option value="public">{__("Public")}</option>
+  //               <option value="private">{__("Private")}</option>
+  //             </FormControl>
+  //           </FormGroup>
+  //         </ExpandWrapper>
+  //         <FormGroup>
+  //           <ControlLabel>Background</ControlLabel>
+  //           <div>
+  //             <OverlayTrigger
+  //               trigger="click"
+  //               rootClose={true}
+  //               placement="bottom"
+  //               overlay={popoverBottom}
+  //             >
+  //               <ColorPick>
+  //                 <ColorPicker
+  //                   style={{ backgroundColor: this.state.backgroundColor }}
+  //                 />
+  //               </ColorPick>
+  //             </OverlayTrigger>
+  //           </div>
+  //         </FormGroup>
+  //       </Flex>
 
-  renderContent = (formProps: IFormProps) => {
-    const { saveAsTemplate } = this.state;
-    const { pipeline, renderExtraFields, options } = this.props;
-    const object = pipeline || ({} as IPipeline);
+  //       {this.renderBoards()}
 
-    const popoverBottom = (
-      <Popover id="color-picker">
-        <TwitterPicker
-          width="266px"
-          triangle="hide"
-          color={this.state.backgroundColor}
-          onChange={this.onColorChange}
-          colors={COLORS}
-        />
-      </Popover>
-    );
+  //       {this.renderSelectMembers()}
 
-    return (
-      <div id="manage-template-modal">
-        <FlexContent>
-          <FlexItem count={4}>
-            <Formgroup>
-              <ControlLabel required={true}>Name</ControlLabel>
-              <FormControl
-                {...formProps}
-                name="name"
-                defaultValue={object.name}
-                autoFocus={true}
-                required={true}
-              />
-            </Formgroup>
-          </FlexItem>
-        </FlexContent>
-        {this.renderTemplates()}
-        {renderExtraFields && renderExtraFields(formProps)}
-        <Flex>
-          <ExpandWrapper>
-            <FormGroup>
-              <ControlLabel required={true}>Visibility</ControlLabel>
-              <FormControl
-                {...formProps}
-                name="visibility"
-                componentClass="select"
-                value={this.state.visibility}
-                onChange={this.onChangeVisibility}
-              >
-                <option value="public">{__('Public')}</option>
-                <option value="private">{__('Private')}</option>
-              </FormControl>
-            </FormGroup>
-          </ExpandWrapper>
-          <FormGroup>
-            <ControlLabel>Background</ControlLabel>
-            <div>
-              <OverlayTrigger
-                trigger="click"
-                rootClose={true}
-                placement="bottom"
-                overlay={popoverBottom}
-              >
-                <ColorPick>
-                  <ColorPicker
-                    style={{ backgroundColor: this.state.backgroundColor }}
-                  />
-                </ColorPick>
-              </OverlayTrigger>
-            </div>
-          </FormGroup>
-        </Flex>
+  //       {this.renderNumberInput()}
 
-        {this.renderBoards()}
+  //       <FormGroup>
+  //         <FlexContent>
+  //           <FlexItem>
+  //             <ControlLabel>{__(`Save as template`)}</ControlLabel>
+  //             <span style={{ marginLeft: "10px" }}>
+  //               <FormControl
+  //                 componentClass="checkbox"
+  //                 checked={saveAsTemplate}
+  //                 onChange={this.onChangeIsSaveAsTemplate}
+  //               />
+  //             </span>
+  //           </FlexItem>
+  //           {saveAsTemplate ? (
+  //             <FlexItem count={4}>
+  //               <FormGroup>
+  //                 <ControlLabel>TemplateName</ControlLabel>
+  //                 <FormControl {...formProps} name="templateName" />
+  //               </FormGroup>
+  //             </FlexItem>
+  //           ) : null}
+  //         </FlexContent>
+  //       </FormGroup>
 
-        {this.renderSelectMembers()}
+  //       <FormGroup>
+  //         <FlexContent>
+  //           <FlexItem>
+  //             <ControlLabel>
+  //               {__(`Show only the user's assigned(created)`)} {this.props.type}
+  //             </ControlLabel>
+  //             <span style={{ marginLeft: "10px" }}>
+  //               <FormControl
+  //                 componentClass="checkbox"
+  //                 checked={this.state.isCheckUser}
+  //                 onChange={this.onChangeIsCheckUser}
+  //               />
+  //             </span>
+  //           </FlexItem>
+  //           <FlexItem>
+  //             <ControlLabel>
+  //               {__(`Show only user’s assigned (created)`)} {this.props.type}{" "}
+  //               {__(`by department`)}
+  //             </ControlLabel>
+  //             <span style={{ marginLeft: "10px" }}>
+  //               <FormControl
+  //                 componentClass="checkbox"
+  //                 checked={this.state.isCheckDepartment}
+  //                 onChange={this.onChangeIsCheckDepartment}
+  //               />
+  //             </span>
+  //           </FlexItem>
+  //         </FlexContent>
+  //       </FormGroup>
 
-        {this.renderNumberInput()}
+  //       {this.renderDominantUsers()}
 
-        <FormGroup>
-          <FlexContent>
-            <FlexItem>
-              <ControlLabel>{__(`Save as template`)}</ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={saveAsTemplate}
-                  onChange={this.onChangeIsSaveAsTemplate}
-                />
-              </span>
-            </FlexItem>
-            {saveAsTemplate ? (
-              <FlexItem count={4}>
-                <FormGroup>
-                  <ControlLabel>TemplateName</ControlLabel>
-                  <FormControl {...formProps} name="templateName" />
-                </FormGroup>
-              </FlexItem>
-            ) : null}
-          </FlexContent>
-        </FormGroup>
-
-        <FormGroup>
-          <FlexContent>
-            <FlexItem>
-              <ControlLabel>
-                {__(`Show only the user's assigned(created)`)} {this.props.type}
-              </ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={this.state.isCheckUser}
-                  onChange={this.onChangeIsCheckUser}
-                />
-              </span>
-            </FlexItem>
-            <FlexItem>
-              <ControlLabel>
-                {__(`Show only user’s assigned (created)`)} {this.props.type}{' '}
-                {__(`by department`)}
-              </ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={this.state.isCheckDepartment}
-                  onChange={this.onChangeIsCheckDepartment}
-                />
-              </span>
-            </FlexItem>
-          </FlexContent>
-        </FormGroup>
-
-        {this.renderDominantUsers()}
-
-        {/* <FormGroup>
-          <ControlLabel>Stages</ControlLabel>
-          <div id="stages-in-pipeline-form">
-            <Stages
-              // options={options}
-              type={this.props.type}
-              stages={this.state.stages}
-              onChangeStages={this.onChangeStages}
-              departments={this.props.departments}
-            />
-          </div>
-        </FormGroup> */}
-      </div>
-    );
-  };
+  //       {/* <FormGroup>
+  //         <ControlLabel>Stages</ControlLabel>
+  //         <div id="stages-in-pipeline-form">
+  //           <Stages
+  //             // options={options}
+  //             type={this.props.type}
+  //             stages={this.state.stages}
+  //             onChangeStages={this.onChangeStages}
+  //             departments={this.props.departments}
+  //           />
+  //         </div>
+  //       </FormGroup> */}
+  //     </div>
+  //   );
 
   render() {
-    return <Form renderContent={this.renderContent} />;
+    const { templates } = this.props;
+    console.log(templates);
+    return <>HI</>;
+    // <Form renderContent={this.renderContent} />;
   }
 }
 

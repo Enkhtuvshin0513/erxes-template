@@ -61,8 +61,6 @@ class StageItem extends React.Component<Props> {
   render() {
     const { stage, onChange, onKeyPress, remove, type } = this.props;
 
-    console.log('HIII');
-
     const onChangeFormControl = (stageId, e) =>
       onChange(stageId, e.target.name, e.target.value);
 
