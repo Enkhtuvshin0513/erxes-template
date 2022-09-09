@@ -1,23 +1,16 @@
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import { IFormProps } from '@erxes/ui/src/types';
 import { __, generateTree } from '@erxes/ui/src/utils';
 import React from 'react';
 import Form from '@erxes/ui/src/components/form/Form';
-import Modal from 'react-bootstrap/Modal';
 import { IDepartment } from '@erxes/ui/src/team/types';
 import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
-import gql from 'graphql-tag';
-import * as compose from 'lodash.flowright';
-import { withProps } from '@erxes/ui/src/utils';
-import { queries as teamQueries } from '@erxes/ui/src/team/graphql';
-import { queries } from '@erxes/ui-settings/src/boards/graphql';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { IBoard, IPipeline, IStage } from '@erxes/ui-cards/src/boards/types';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import Select from 'react-select-plus';
 import { COLORS } from '@erxes/ui/src/constants/colors';
-import { graphql } from 'react-apollo';
 import { Flex } from '@erxes/ui/src/styles/main';
 import { ExpandWrapper } from '@erxes/ui-settings/src/styles';
 import { SelectMemberStyled } from '@erxes/ui-settings/src/boards/styles';
@@ -28,8 +21,6 @@ import TwitterPicker from 'react-color/lib/Twitter';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import { colors } from '@erxes/ui/src/styles';
 import { IOption } from './settings/boards/types';
-import Stages from './settings/boards/components/Stages';
-import BoardNumberConfigs from './settings/boards/components/numberConfig/BoardNumberConfigs';
 
 type Props = {
   boardId: string;
@@ -122,30 +113,6 @@ class TemplateForm extends React.Component<Props, State> {
     this.setState({ isCheckDepartment: isChecked });
   };
 
-  renderBoards() {
-    const { boards } = this.props;
-
-    // const boardOptions = boards.map(board => ({
-    //   value: board._id,
-    //   label: board.name
-    // }));
-
-    // const onChange = item => this.setState({ boardId: item.value });
-
-    return (
-      <FormGroup>
-        <ControlLabel required={true}>Board</ControlLabel>
-        <Select
-          placeholder={__('Choose a board')}
-          value={this.state.boardId}
-          // options={boardOptions}
-          // onChange={onChange}
-          clearable={false}
-        />
-      </FormGroup>
-    );
-  }
-
   renderSelectMembers() {
     const { visibility, selectedMemberIds, departmentIds } = this.state;
 
@@ -189,74 +156,6 @@ class TemplateForm extends React.Component<Props, State> {
       </>
     );
   }
-  renderNumberInput() {
-    return (
-      <FormGroup>
-        <BoardNumberConfigs
-          onChange={(key: string, conf: string) =>
-            this.onChangeNumber(key, conf)
-          }
-          config={this.state.numberConfig || ''}
-          size={this.state.numberSize || ''}
-        />
-      </FormGroup>
-    );
-  }
-
-  renderDominantUsers() {
-    const { isCheckUser, isCheckDepartment, excludeCheckUserIds } = this.state;
-
-    if (!isCheckUser && !isCheckDepartment) {
-      return;
-    }
-
-    return (
-      <FormGroup>
-        <SelectMemberStyled>
-          <ControlLabel>
-            Users eligible to see all {this.props.type}
-          </ControlLabel>
-
-          <SelectTeamMembers
-            label="Choose members"
-            name="excludeCheckUserIds"
-            initialValue={excludeCheckUserIds}
-            onSelect={this.onChangeDominantUsers}
-          />
-        </SelectMemberStyled>
-      </FormGroup>
-    );
-  }
-
-  renderTemplates() {
-    const { templates } = this.props;
-
-    const boardOptions = templates.map(template => ({
-      value: template._id,
-      label: template.name
-    }));
-
-    const onChange = item => {
-      const template = templates.find(template => template._id === item.value);
-
-      this.setState({ stages: template.content.stages });
-
-      this.setState({ template: item.value });
-    };
-
-    return (
-      <FormGroup>
-        <ControlLabel required={true}>Template</ControlLabel>
-        <Select
-          placeholder={__('Choose a template')}
-          value={this.state.template}
-          options={boardOptions}
-          onChange={onChange}
-          clearable={false}
-        />
-      </FormGroup>
-    );
-  }
 
   renderContent = (formProps: IFormProps) => {
     const { saveAsTemplate } = this.state;
@@ -292,9 +191,6 @@ class TemplateForm extends React.Component<Props, State> {
           </FlexItem>
         </FlexContent>
 
-        {this.renderTemplates()}
-
-        {/* {renderExtraFields && renderExtraFields(formProps)} */}
         <Flex>
           <ExpandWrapper>
             <FormGroup>
@@ -329,67 +225,6 @@ class TemplateForm extends React.Component<Props, State> {
             </div>
           </FormGroup>
         </Flex>
-
-        {this.renderBoards()}
-
-        {this.renderSelectMembers()}
-
-        {this.renderNumberInput()}
-
-        <FormGroup>
-          <FlexContent>
-            <FlexItem>
-              <ControlLabel>{__(`Save as template`)}</ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={saveAsTemplate}
-                  onChange={this.onChangeIsSaveAsTemplate}
-                />
-              </span>
-            </FlexItem>
-            {saveAsTemplate ? (
-              <FlexItem count={4}>
-                <FormGroup>
-                  <ControlLabel>TemplateName</ControlLabel>
-                  <FormControl {...formProps} name="templateName" />
-                </FormGroup>
-              </FlexItem>
-            ) : null}
-          </FlexContent>
-        </FormGroup>
-
-        <FormGroup>
-          <FlexContent>
-            <FlexItem>
-              <ControlLabel>
-                {__(`Show only the user's assigned(created)`)} {this.props.type}
-              </ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={this.state.isCheckUser}
-                  onChange={this.onChangeIsCheckUser}
-                />
-              </span>
-            </FlexItem>
-            <FlexItem>
-              <ControlLabel>
-                {__(`Show only user’s assigned (created)`)} {this.props.type}{' '}
-                {__(`by department`)}
-              </ControlLabel>
-              <span style={{ marginLeft: '10px' }}>
-                <FormControl
-                  componentClass="checkbox"
-                  checked={this.state.isCheckDepartment}
-                  onChange={this.onChangeIsCheckDepartment}
-                />
-              </span>
-            </FlexItem>
-          </FlexContent>
-        </FormGroup>
-
-        {this.renderDominantUsers()}
 
         {/* <FormGroup>
           <ControlLabel>Stages</ControlLabel>

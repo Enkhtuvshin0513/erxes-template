@@ -65,8 +65,6 @@ class TemplateForm extends React.Component<FinalProps, State> {
   renderContent = (formProps: IFormProps) => {
     const { closeModal, templatesQuery } = this.props;
 
-    console.log(templatesQuery);
-
     return (
       <>
         {this.renderDynamicContent()}
